@@ -1,0 +1,228 @@
+[Youtube Clone Coding]
+
+1. nodejs 설치(그냥 next)
+
+2. npm 설치(on vscode)
+
+3. 프로젝트 폴더 생성(YoutubeClone)
+
+4. package.json 파일 생성
+	(1) github에 repo 생성(https://github.com/Sangreal2021/wetube-reloaded.git)
+	(2) vscode 터미널에서 
+		1) git init
+		2) git remote add origin https://github.com/Sangreal2021/wetube-reloaded.git
+		※ 혹시 main branch가 안잡히면 git pull origin main으로 브랜치 생성.
+		3) npm init 으로 아래처럼 package.json 자동 생성
+
+		{
+		  "name": "wetube-reloaded",
+		  "version": "1.0.0",
+		  "description": "The best way to watch videos",
+		  "main": "index.js",
+		  "repository": {
+			"type": "git",
+			"url": "(https://github.com/Sangreal2021/wetube-reloaded.git)"
+		  },
+		  "scripts": {
+			"win": "node index.js"
+		  },
+		  "author": "Ham ilwoo<hiw051515@gmail.com>",
+		  "license": "MIT",
+		  "bugs": {
+			"url": "https://github.com/Sangreal2021/wetube-reloaded.git"
+		  },
+		  "homepage": "https://github.com/Sangreal2021/wetube-reloaded.git"
+		}
+
+5. 터미널에서 실행(반드시 package.json이 있는 곳에서 해야함)
+	npm run win -> win이라는 스크립트를 실행
+	
+6. 서버 만들기(i : install)
+	1) npm i express -> 폴더에 자동으로 module 및 lock파일 생성
+	2) module과 lock 파일은 삭제, package.json에 dependencies만 자동추가된 상태.
+	3) npm i -> package.json에 있는 dependencies만 보고 다시 module과 lock파일을 생성.
+	즉, 프로젝트 공유시 package.json과 index.js만 보내면 됨!
+	
+7. https://babeljs.io/ : javascript 컴파일러
+	최신 JS언어를 안정적인 구버전 언어로 변환(nodeJS가 이해할수 있도록)
+	1) 설치 : npm install --save-dev @babel/core
+	2) package.json에 devDependencies 추가됨, 그리고 당연히 node_modules에 설치됨
+	3) babel.config.json 파일 생성
+		{
+			"presets": ["@babel/preset-env"]
+		}
+	4) babel/preset 설치
+		npm install @babel/preset-env --save-dev
+			-> package.json에 devDependencies에 추가됨
+		※ presets : 엄청 큰 babel을 위한 플러그인 ex)preset-env
+	5) babel/node 설치
+		npm install @babel/node --save-dev
+	6) package.json에서 script를 dev로 변경
+		  "scripts": {
+			"dev": "babel-node index.js"
+		  },
+	7) index.js 수정
+		// console.log("Hello NodejS");
+		// const express = require("express");
+		import express from "express"; // 위보다 더 최신 문법
+
+		// const app = express();
+
+		console.log("Hi~");
+		
+		-> npm run dev
+	8) nodemon 설치 : 파일 수정되면 알아서 변경 재시작 해줌
+		npm install nodemon --save-dev
+		package.json에서 수정
+		  "scripts": {
+			"dev": "nodemon --exec babel-node index.js"
+		  },
+		
+		-> npm run dev 실행하면 콘솔 종료안되고, index.js를 수정하고 저장시 바로 반영됨
+		   npm run dev를 매번 실행할 필요X
+	
+	※ node index.js -> babel-node index.js -> nodemon --exec babel-node index.js
+	
+	9) src 폴더 만들고 index.js 같은 파일 이동
+		package.json에서 아래처럼 경로수정
+		  "scripts": {
+			"dev": "nodemon --exec babel-node src/index.js"
+		  },
+		-> npm run dev
+		
+		index.js -> server.js로 변경 후 package.json 내 index 파일명 변경
+		
+		server.js에 아래 내용 작성
+		
+		import express from "express";
+		// create application
+		const PORT = 4000;
+		const app = express();
+
+		// application 설정
+		const handleHome = () => console.log("Somebody is trying to go home.");
+		app.get("/", handleHome);
+
+
+		// 외부 접속 listen
+		const handleListening = () => console.log(`✅ Server listening on port http://localhost:${PORT} 🎶`);
+		app.listen(PORT, handleListening);
+		
+	10) req, res
+		: 브라우저로부터 / get request를 받아서 res.send("I still hate you");로 보내고 종료.
+		
+		import express from "express";
+		// create application
+		const PORT = 4000;
+		const app = express();
+----------------------------------------------------------------------------------------------------------------
+		// application 설정
+		const handleHome = (req, res) => {
+			// console.log(res);
+			// return res.end(); // 서버가 response를 끝냄
+			return res.send("I still hate you!");
+		}
+		app.get("/", handleHome);
+
+
+		// 외부 접속 listen
+		const handleListening = () => console.log(`✅ Server listening on port http://localhost:${PORT} 🎶`);
+		app.listen(PORT, handleListening);
+		
+----------------------------------------------------------------------------------------------------------------
+		// application 설정
+		const handleHome = (req, res) => {
+			// console.log(res);
+			// return res.end(); // 서버가 response를 끝냄
+			// return res.send("<h1>I wanna GO!!</h1>");
+			return res.send({ message: "I wanna GO!!"});
+		}
+
+		const handleLogin = (req, res) => {
+			return res.send("Login here.");
+		}
+
+		app.get("/", handleHome);
+		app.get("/login", handleLogin);
+
+8. middleware : request와 response 사이에 존재
+	handler, controller, mvc 등
+	
+	const handleHome = (req, res, next) => {
+		// console.log(res);
+		// return res.end(); // 서버가 response를 끝냄
+		// return res.send("<h1>I wanna GO!!</h1>");
+		return res.send({ message: "I wanna GO!!"});
+	}
+	-> next 매개변수는 다음 함수를 호출
+	
+	// application 설정
+	const handleHome = (req, res, next) => {
+		// console.log(res);
+		// return res.end(); // 서버가 response를 끝냄
+		// return res.send("<h1>I wanna GO!!</h1>");
+		// return res.send({ message: "I wanna GO!!"});
+		next();
+	}
+	-> 페이지에 cannot GET / 뜸
+	
+9. app.use();
+	- global middleware(어떤 URL에도 작동하는)를 만들 수 있게 해줌.
+	--------------------------------------------------------------------------------------------------------------
+	- 순서가 중요!! (use -> get)
+	app.use(gossipMiddleware);
+	app.get("/", handleHome);
+	
+	-> 설명은 server_desc.js로 확인.
+	-> 진짜 application 만들기 -> server.js부터 시작
+		import express from "express";
+		// create application
+		const PORT = 4000;
+		const app = express();
+
+		// application 설정
+		// MW
+		const logger = (req, res, next) => {
+			// console.log("I'm in the middle!");
+			// return res.send("I have the power now - middleware -"); // handleHome으로 넘어가지 않음
+			console.log(`${req.method} ${req.url}`); // req.url = 루트(/)
+			next();
+		}
+		// MW
+		const privateMiddleware = (req, res, next) => {
+			const url = req.url;
+			if(url === "/protected"){
+				return res.send("<h1>Not Allowed</h1>");
+			}
+			console.log("Allowed, you may continue.");
+			next();
+		}
+
+		const handleProtected = (req, res) => {
+			return res.send("Welcome to the private Lounge.");
+		}
+
+		const handleHome = (req, res) => {
+			// console.log(res);
+			// return res.end(); // 서버가 response를 끝냄
+			// return res.send("<h1>I wanna GO!!</h1>");
+			// return res.send({ message: "I wanna GO!!"});
+			// return res.end();
+			return res.send("I know middlewares");
+			// next();
+		}
+		app.use(logger);
+		app.use(privateMiddleware);
+		app.get("/", handleHome);
+		app.get("/protected", handleProtected);
+
+		const handleLogin = (req, res) => {
+			return res.send("Login here.");
+		}
+		app.get("/login", handleLogin);
+
+
+		// 외부 접속 listen
+		const handleListening = () => console.log(`✅ Server listening on port http://localhost:${PORT} 🎶`);
+		app.listen(PORT, handleListening);
+	--------------------------------------------------------------------------------------------------------------
