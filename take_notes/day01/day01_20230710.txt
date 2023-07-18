@@ -1,4 +1,5 @@
-[Youtube Clone Coding]
+<Youtube Clone Coding>
+[day01]
 
 1. nodejs 설치(그냥 next)
 
@@ -225,4 +226,6 @@
 		// 외부 접속 listen
 		const handleListening = () => console.log(`✅ Server listening on port http://localhost:${PORT} 🎶`);
 		app.listen(PORT, handleListening);
-	--------------------------------------------------------------------------------------------------------------
+	
+==================================================================================================================
+#3.7까지
