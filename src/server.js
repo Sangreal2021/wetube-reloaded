@@ -1,30 +1,29 @@
 import express from "express";
 import morgan from "morgan";
+
 // create application
 const PORT = 4000;
 const app = express();
 const logger = morgan("dev");
+app.use(logger);
 
 // application 설정
 // MW
+const globalRouter = express.Router();
+const handleHome = (req, res) => res.send("Home");
+globalRouter.get("/", handleHome);
 
+const userRouter = express.Router();
+const HandleEditUser = (req, res) => res.send("Edit User");
+userRouter.get("/edit", HandleEditUser);
 
-const home = (req, res) => {
-    console.log("I will respond");
-    return res.send("<h1>I know Middlewares</h1>");
-};
-const login = (req, res) => {
-    return res.send("login");
-}
-// 아래 코드는 반드시 순서대로
-app.use(logger);
-app.get("/", home);
-app.get("/login", login);
+const videoRouter = express.Router();
+const HandleWatchVideo = (req, res) => res.send("Watch Video");
+videoRouter.get("/watch", HandleWatchVideo);
 
-const handleLogin = (req, res) => {
-    return res.send("Login here.");
-};
-app.get("/login", handleLogin); // 요청을 받아 함수를 실행
+app.use("/", globalRouter);
+app.use("/videos", videoRouter);
+app.use("/users", userRouter);
 
 
 // 외부 접속 listen
