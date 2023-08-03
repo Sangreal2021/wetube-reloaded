@@ -1,0 +1,124 @@
+#4.2
+
+1. src폴더 아래 routers 폴더 생성
+	
+	(1) 그 아래 globalRoueter.js, userRouter.js, videoRouter.js 파일 생성
+		server.js의 Router들을 각각의 파일로 이동.
+		
+		import express from "express";
+		import morgan from "morgan";
+		import globalRouter from "./routers/globalRouter";
+		import videoRouter from "./routers/videoRouter";
+		import userRouter from "./routers/userRouter";
+
+		// create application
+		const PORT = 4000;
+		const app = express();
+		const logger = morgan("dev");
+		app.use(logger);
+
+		app.use("/", globalRouter);
+		app.use("/videos", videoRouter);
+		app.use("/users", userRouter);
+
+
+		// 외부 접속 listen
+		const handleListening = () => console.log(`✅ Server listening on port http://localhost:${PORT} 🎶`);
+		app.listen(PORT, handleListening); // listen(설정, 함수)
+	
+	(2) globalRoueter.js
+		
+		import express from "express";
+
+		const globalRouter = express.Router();
+
+		const handleHome = (req, res) => res.send("Home");
+		const handleJoin = (req, res) => res.send("Join");
+
+		globalRouter.get("/", handleHome);
+		globalRouter.get("/join", handleJoin);
+
+		// 다른 파일에서 이 라우터를 import하려면 아래처럼 export해야함.
+		export default globalRouter;
+		
+	(3) userRouter.js
+	
+		import express from "express";
+
+		const userRouter = express.Router();
+
+		const handleEdit = (req, res) => res.send("Edit User");
+		const handleDelete = (req, res) => res.send("Delete User");
+
+		userRouter.get("/edit", handleEdit);
+		userRouter.get("/delete", handleDelete);
+
+		export default userRouter;
+	
+	(4) videoRouter.js
+		
+		import express from "express";
+
+		const videoRouter = express.Router();
+
+		const handleWatchVideo = (req, res) => res.send("Watch Video");
+		const handleEdit = (req, res) => res.send("Edit Video");
+
+		videoRouter.get("/watch", handleWatchVideo);
+		videoRouter.get("/edit", handleEdit);
+
+		export default videoRouter;
+		
+		
+#4.3
+
+1. src 아래 controllers 폴더 생성
+	- router 파일에서 controller부분을 각각의 controller파일로 이동.
+	- controller.js 파일들에서 각각의 함수들을 import하기 위해 함수 앞에 export 해줌.
+	  그리고 router.js에서 해당 함수들을 import.
+	- export default는 각 파일당 하나밖에 안됨.
+
+	(1) globalRouter.js
+		import express from "express";
+		import { join } from "../controllers/userController";
+		import { trending } from "../controllers/videoController";
+
+		const globalRouter = express.Router();
+
+		globalRouter.get("/", trending);
+		globalRouter.get("/join", join);
+
+		// 다른 파일에서 이 라우터를 import하려면 아래처럼 export해야함.
+		export default globalRouter;
+		
+	(2) userRouter.js
+		import express from "express";
+		import {edit, remove} from "../controllers/userController";
+
+		const userRouter = express.Router();
+
+		userRouter.get("/edit", edit);
+		userRouter.get("/remove", remove);
+
+		export default userRouter;
+		
+	(3) videoRouter.js
+		import express from "express";
+		import {watch, edit} from "../controllers/videoController";
+
+		const videoRouter = express.Router();
+
+		videoRouter.get("/watch", watch);
+		videoRouter.get("/edit", edit);
+
+		export default videoRouter;
+		
+	(4) userController.js
+		export const join = (req, res) => res.send("Join");
+		export const edit = (req, res) => res.send("Edit User");
+		export const remove = (req, res) => res.send("Remove User");
+		
+	(5) videoController.js
+		export const trending = (req, res) => res.send("Home Page Videos");
+		export const watch = (req, res) => res.send("Watch");
+		export const edit = (req, res) => res.send("Edit");
