@@ -122,3 +122,7 @@
 		export const trending = (req, res) => res.send("Home Page Videos");
 		export const watch = (req, res) => res.send("Watch");
 		export const edit = (req, res) => res.send("Edit");
+
+#4.4 recap
+1. 라우터 : url의 그룹화.
+			공통 시작부분을 기반으로 url을 정리해주는 방법.
