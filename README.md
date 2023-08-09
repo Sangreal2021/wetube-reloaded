@@ -18,7 +18,8 @@
 /users/delete -> Delete User<br>
 
 // Video router<br>
-/videos/watch -> Watch Video<br>
+/videos/:id -> Watch Video<br>
+/videos/upload -> Upload Video<br>
 /videos/edit -> Edit Video<br>
 /videos/delete -> Delete Video<br>
 /videos/comments -> Comment on a video<br>

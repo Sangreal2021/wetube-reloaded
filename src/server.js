@@ -1,5 +1,6 @@
 import express from "express";
 import morgan from "morgan";
+// default이기 때문에 이름을 globalRouter가 아닌 다른것으로 써도 됨.
 import globalRouter from "./routers/globalRouter";
 import videoRouter from "./routers/videoRouter";
 import userRouter from "./routers/userRouter";
