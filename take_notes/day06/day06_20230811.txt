@@ -1,0 +1,36 @@
+#4.7
+1. videoController.js
+
+export const trending = (req, res) => res.send("Home Page Videos");
+export const see = (req, res) => {
+    console.log(req.params);
+    return res.send("Watch");
+};
+export const edit = (req, res) => {
+    console.log(req.params);
+    return res.send("Edit");
+};
+export const search = (req, res) => res.send("Search");
+export const upload = (req, res) => res.send("Upload");
+export const deleteVideo = (req, res) => {
+    console.log(req.params);
+    return res.send("Delete Video");
+};
+
+2. videlRouter.js
+
+-- 아래에서 ':'은 변수라는 의미
+-- upload를 id보다 위에 작성한 이유
+	: upload라는 단어도 id로 인식하기 때문.
+
+import express from "express";
+import { see, edit, upload, deleteVideo } from "../controllers/videoController";
+
+const videoRouter = express.Router();
+
+videoRouter.get("/upload", upload);
+videoRouter.get("/:id", see);
+videoRouter.get("/:id/edit", edit);
+videoRouter.get("/:id/delete", deleteVideo);
+
+export default videoRouter;
