@@ -7,20 +7,17 @@
 </ul>
 
 <h2>USER와 도메인</h2>
-// Global router<br>
 / -> Home<br>
 /join -> Join<br>
 /login -> Login<br>
 /search -> Search<br>
 
-// User router<br>
-/users/edit -> Edit User<br>
-/users/delete -> Delete User<br>
+/users/:id -> See User<br>
+/users/logout -> Log Out<br>
+/users/edit -> Edit My Profile<br>
+/users/delete -> Delete My Profile<br>
 
-// Video router<br>
-/videos/:id -> Watch Video<br>
+/videos/:id -> See Video<br>
+/videos/:id/edit -> Edit Video<br>
+/videos/:id/delete -> Delete Video<br>
 /videos/upload -> Upload Video<br>
-/videos/edit -> Edit Video<br>
-/videos/delete -> Delete Video<br>
-/videos/comments -> Comment on a video<br>
-/videos/comments/delete -> Delete A Comment fo a video<br>

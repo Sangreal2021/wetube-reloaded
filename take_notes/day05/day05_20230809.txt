@@ -1,4 +1,90 @@
 #4.5
 
 #4.6 (01:28)
-1. 
+1. README.md 파일 수정
+	# wetube-reloaded
+	<h2>설치방법</h2>
+	<ul>
+	  <li>nodejs 다운 및 설치</li>
+	  <li>vscode에서 npm 설치</li>
+	  <li>npm i => Booya!</li>
+	</ul>
+
+	<h2>USER와 도메인</h2>
+	/ -> Home<br>
+	/join -> Join<br>
+	/login -> Login<br>
+	/search -> Search<br>
+
+	/users/:id -> See User<br>
+	/users/logout -> Log Out<br>
+	/users/edit -> Edit My Profile<br>
+	/users/delete -> Delete My Profile<br>
+
+	/videos/:id -> See Video<br>
+	/videos/:id/edit -> Edit Video<br>
+	/videos/:id/delete -> Delete Video<br>
+	/videos/upload -> Upload Video<br>
+	
+2. globalRouter.js
+
+import express from "express";
+import { join } from "../controllers/userController";
+import { trending } from "../controllers/videoController";
+
+const globalRouter = express.Router();
+
+globalRouter.get("/", trending);
+globalRouter.get("/join", join);
+globalRouter.get("/login", login);
+globalRouter.get("/search", search);
+
+// 다른 파일에서 이 라우터를 import하려면 아래처럼 export해야함.
+export default globalRouter;
+
+3. userRouter.js
+
+import express from "express";
+import { edit, remove } from "../controllers/userController";
+
+const userRouter = express.Router();
+
+userRouter.get("/logout", logout);
+userRouter.get("/edit", edit);
+userRouter.get("/remove", remove);
+userRouter.get(":id", see);
+
+export default userRouter;
+
+4. videoRouter.js
+
+import express from "express";
+import { see, edit, upload, deleteVideo } from "../controllers/videoController";
+
+const videoRouter = express.Router();
+
+videoRouter.get("/upload", upload);
+videoRouter.get("/:id", see);
+videoRouter.get("/:id/edit", edit);
+videoRouter.get("/:id/delete", deleteVideo);
+
+export default videoRouter;
+
+5. userController.js
+
+export const join = (req, res) => res.send("Join");
+export const edit = (req, res) => res.send("Edit User");
+export const remove = (req, res) => res.send("Remove User");
+export const login = (req, res) => res.send("Login");
+export const logout = (req, res) => res.send("Log out");
+export const see = (req, res) => res.send("See User");
+	
+6. videoController.js
+
+export const trending = (req, res) => res.send("Home Page Videos");
+export const see = (req, res) => res.send("Watch");
+export const edit = (req, res) => res.send("Edit");
+export const search = (req, res) => res.send("Search");
+export const upload = (req, res) => res.send("Upload");
+export const deleteVideo = (req, res) => res.send("Delete Video");
+
