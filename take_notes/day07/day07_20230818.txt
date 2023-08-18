@@ -1,0 +1,261 @@
+#4.8
+
+-- id는 숫자만 사용가능하도록.. (정규표현식 사용)
+
+1. 'nico' + @ 가 들어가는 단어 선택
+/(nico\w+)/g
+
+
+2. 숫자만 선택
+/(\d+)/g
+
+
+3. videoRouter.js
+
+import express from "express";
+import { see, edit, upload, deleteVideo } from "../controllers/videoController";
+
+const videoRouter = express.Router();
+
+videoRouter.get("/:id(\\d+)", see);
+videoRouter.get("/:id(\\d+)/edit", edit);
+videoRouter.get("/:id(\\d+)/delete", deleteVideo);
+videoRouter.get("/upload", upload);
+
+export default videoRouter;
+
+=> 위처럼 upload가 맨 아래 나와도 url 이동에 문제 없음!!
+
+
+#5.0
+
+-- 숫자나 문자가 아니라 html을 리턴
+
+
+#5.1
+
+1. Pug 설치(template engine)
+	- 템플릿을 이용해서 뷰를 만드는걸 도와줌.
+	- npm i pug
+
+2. server.js -> pug관련 app.set() 추가
+	- pug를 뷰 엔진으로 설정.
+
+// create application
+const PORT = 4000;
+const app = express();
+const logger = morgan("dev");
+
+app.set("view engine", "pug");
+app.use(logger);
+app.use("/", globalRouter);
+app.use("/videos", videoRouter);
+app.use("/users", userRouter);
+
+3. src 아래 views 폴더 생성.
+
+	(1) 그 아래 home.pug 파일 생성
+		
+		doctype html
+		html(lang="ko")
+			head
+				title Wetube
+			body
+				h1 Welcome to Wetube
+				footer &copy; 2023 Wetube
+				
+	(2) videoController.js
+		-- 뷰를 렌더링 해줌.
+		export const trending = (req, res) => res.render("home");
+		export const see = (req, res) => {
+			return res.send(`Watch Video #${req.params.id}`);
+		};
+		
+	=> localhost/4000 하면 에러 발생
+	=> server.js 에 console.log(process.cwd());넣고 새로고침하면 실제 경로 출력됨
+		(D:\private\Study\MegaStudy\Study\web\Nomad_JS\wetube-reloaded)
+	=> 서버를 구동하거나 node.js를 실행하는건 src가 아니라 package.json임.
+
+
+#5.2
+
+1. views 폴더를 src 밖으로 이동. (효과는 있지만 사용X)
+
+
+2. server.js 수정
+- 디폴트 값은 "현재 작업 디렉토리 + /views"이지만
+  아래 수정을 통해 "현재 작업 디렉토리 + /src/views" 로 수정
+
+app.set("view engine", "pug");
+app.set("views", process.cwd() + "/src/views");
+app.use(logger);
+app.use("/", globalRouter);
+app.use("/videos", videoRouter);
+app.use("/users", userRouter);
+
+=> localhost/4000 치면 정상 작동!
+
+
+3. watch.pug 생성
+
+doctype html
+html(lang="ko")
+    head
+        title Wetube
+    body
+        h1 Watch Video!
+        footer &copy; #{new Date().getFullYear()} Wetube
+
+※ home.pug에도 #{new Date().getFullYear()} 적용
+
+
+4. videoController.js 수정
+- watch는 watch.pug와 반드시 파일명 일치해야함!
+export const see = (req, res) => res.render("watch");
+
+=> http://localhost:4000/videos/111 치면 정상 작동!
+
+
+5. footer 처럼 공통된 부분을 만들고 싶을 때
+	- views 폴더 아래 partials 폴더 생성 -> footer.pug 파일 생성
+		footer &copy; #{new Date().getFullYear()} Wetube
+		
+	- home.pug 와 watch.pug 아래 include partials/footer.pug 추가
+	=> url 치면 모두 정상 작동!
+	
+
+6. views 폴더 아래 edit.pug 파일 생성
+
+doctype html
+html(lang="ko")
+    head
+        title Wetube
+    body
+        h1 Edit
+    include partials/footer.pug
+	
+--------------------------------------------------------------------
+videoController.js
+
+export const trending = (req, res) => res.render("home");
+export const see = (req, res) => res.render("watch");
+export const edit = (req, res) => res.render("edit");
+export const search = (req, res) => res.send("Search");
+export const upload = (req, res) => res.send("Upload");
+export const deleteVideo = (req, res) => {
+    return res.send("Delete Video");
+};
+
+
+#5.3
+
+1. views 폴더에 base.pug 파일 생성
+- content라는 block을 지정.
+
+doctype html
+html(lang="ko")
+    head
+        title Wetube
+    body
+        block content
+    include partials/footer.pug
+	
+2. home.pug, watch.pug, edit.pug 파일들을 아래처럼 변경
+	(1) home.pug
+		extends base.pug
+
+		block content
+			h1 Home!
+
+	(2) watch.pug
+		extends base.pug
+
+		block content
+			h1 Watch Video
+			
+	(3) edit.pug
+		extends base.pug
+
+		block content
+			h1 Edit Video
+			
+3. base.pug 수정
+
+doctype html
+html(lang="ko")
+    head
+        block head
+    body
+        block content
+    include partials/footer.pug
+
+4. home.pug, watch.pug, edit.pug 파일들을 아래처럼 변경
+	(1) home.pug
+		extends base.pug
+
+		block head
+			title Home | Wetube
+
+		block content
+			h1 Home!
+
+	(2) watch.pug
+		extends base.pug
+
+		block head
+			title Watch | Wetube
+
+		block content
+			h1 Watch Video
+			
+	(3) edit.pug
+		extends base.pug
+
+		block head
+			title Edit | Wetube
+
+		block content
+			h1 Edit Video
+			
+
+#5.4 변수 지정 및 공통부분 통합
+
+1. videoController.js 수정
+- pageTitle, potato가 변수
+
+export const trending = (req, res) => res.render("home", {pageTitle: "Home", potato: "tomato"});
+export const see = (req, res) => res.render("watch", {pageTitle: "Watch"});
+export const edit = (req, res) => res.render("edit", {pageTitle: "Edit"});
+
+
+2. base.pug
+
+doctype html
+html(lang="ko")
+    head
+        title #{pageTitle} | Wetube
+    body
+        block content
+    include partials/footer.pug
+
+3. home.pug
+
+extends base.pug
+
+block content
+    h1 I love #{potato}
+	
+4. watch.pug
+
+extends base.pug
+
+block content
+    h1 Watch Video
+	
+5. edit.pug
+
+extends base.pug
+
+block content
+    h1 Edit Video
+	
