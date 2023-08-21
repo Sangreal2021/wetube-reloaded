@@ -171,3 +171,190 @@ block content
             li Sorry Nothing found.
 			
 => url 치면 목록 출력
+
+
+#5.9 Mixins
+	- 데이터를 받을 수 있는 partial
+
+1. videoController.js 수정
+-- videos 배열을 생성.
+
+export const trending = (req, res) => {
+    const videos = [
+        {
+            title: "First Video",
+            rating: 5,
+            comments: 2,
+            createdAt: "2 minutes ago",
+            views: 59,
+            id: 1,
+        },
+        {
+            title: "Second Video",
+            rating: 5,
+            comments: 2,
+            createdAt: "2 minutes ago",
+            views: 59,
+            id: 1,
+        },
+        {
+            title: "Third Video",
+            rating: 5,
+            comments: 2,
+            createdAt: "2 minutes ago",
+            views: 59,
+            id: 1,
+        },
+    ];
+    return res.render("home", {pageTitle: "Home", videos})
+};
+export const see = (req, res) => res.render("watch", {pageTitle: "Watch"});
+export const edit = (req, res) => res.render("edit", {pageTitle: "Edit"});
+export const search = (req, res) => res.send("Search");
+export const upload = (req, res) => res.send("Upload");
+export const deleteVideo = (req, res) => {
+    return res.send("Delete Video");
+};
+
+2. home.pug 수정
+-- 위의 videos 배열을 Home 화면에 뿌림.
+
+extends base.pug
+
+block content
+    h2 Welcome here you will see the trending videos
+    each video in videos
+        div
+            h4=video.title
+            ul
+                li #{video.rating}/5.
+                li #{video.comments} comments.
+                li Posted #{video.createdAt}.
+                li #{video.views} views.
+    else
+        li Sorry Nothing found.
+
+3. views 폴더 아래 mixins 폴더 생성 -> 그 아래 video.pug 파일 생성.
+	
+mixin video(info)
+    div
+        h4=info.title
+        ul
+            li #{info.rating}/5.
+            li #{info.comments} comments.
+            li Posted #{info.createdAt}.
+            li #{info.views} views.
+			
+4. home.pug 수정
+-- mixins폴더에 video 파일 include 해줌.
+
+extends base.pug
+include mixins/video
+
+block content
+    h2 Welcome here you will see the trending videos
+    each potato in videos
+        +video(potato)
+    else
+        li Sorry Nothing found.
+		
+=> url 치면 성공!
+=> 이제부터 mixins의 video 객체를 어디서나 이용가능(include를 통해서)
+
+
+※ iteration 사용법
+	- each x in [1, 2, 3, 4, 5]
+		li=x
+	  else
+		li Sorry nothing found.
+		
+		
+========================================================================================================
+
+#6.0 MongoDB and Mongoose
+
+- data를 백엔드에 어떻게 post하는지?
+- db에 저장.
+
+1. videoController.js 수정
+-- videos 배열은 모든 controller에서 사용가능 해짐.(trending, see, edit ...)
+-- let videos는 가짜 array db.(테스트용) -> 나중에 진짜 DB에서 사용 예정.
+
+let videos = [
+    {
+        title: "First Video",
+        rating: 5,
+        comments: 2,
+        createdAt: "2 minutes ago",
+        views: 59,
+        id: 1,
+    },
+    {
+        title: "Second Video",
+        rating: 5,
+        comments: 2,
+        createdAt: "2 minutes ago",
+        views: 59,
+        id: 2,
+    },
+    {
+        title: "Third Video",
+        rating: 5,
+        comments: 2,
+        createdAt: "2 minutes ago",
+        views: 59,
+        id: 3,
+    },
+];
+
+export const trending = (req, res) => {
+    return res.render("home", {pageTitle: "Home", videos})
+};
+export const see = (req, res) => res.render("watch", {pageTitle: "Watch"});
+export const edit = (req, res) => res.render("edit", {pageTitle: "Edit"});
+export const search = (req, res) => res.send("Search");
+export const upload = (req, res) => res.send("Upload");
+export const deleteVideo = (req, res) => res.send("Delete Video");
+
+2. video.pug 수정
+-- JS 사용을 위해 백틱(`)을 이용.
+
+mixin video(video)
+    div
+        h4
+            a(href=`/videos/${video.id}`)=video.title
+        ul
+            li #{video.rating}/5.
+            li #{video.comments} comments.
+            li Posted #{video.createdAt}.
+            li #{video.views} views.
+
+=> home 화면에서 클릭시 1, 2, 3 번째 비디오 시청으로 넘어감.
+
+3. videoController.js 수정 (see 컨트롤러)
+-- see를 전부 watch로 수정 요망. (videoController.js, videoRouter.js)
+
+export const watch = (req, res) => {
+    // ES6 문법
+    const {id} = req.params;
+    // const id = req.params.id;
+    // console.log("Show video", id);
+
+    const video = videos[id-1];
+
+    return res.render("watch", { pageTitle: `Watching ${video.title}`, video });
+};
+
+=> 홈 화면에서 각 비디오 링크 클릭시 타이틀을 각 영상의 제목으로 설정.
+
+
+#6.1 Array DB part 2
+
+1. watch.pug 수정
+-- 조회수가 1이면 view, 2 이상이면 views로 출력
+
+extends base.pug
+
+block content
+    h3 #{video.views} #{video.views === 1 ? "view" : "views"}
+	
