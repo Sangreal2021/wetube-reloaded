@@ -1,0 +1,173 @@
+#5.6
+
+1. html 요소를 꾸미는 모듈 설치(MVP.css)
+	
+	(1) base.pug에 추가
+		- link(rel="stylesheet", href="https://unpkg.com/mvp.css") 추가
+		
+		doctype html
+		html(lang="ko")
+			head
+				title #{pageTitle} | Wetube
+				link(rel="stylesheet", href="https://unpkg.com/mvp.css")
+			body
+				main
+					block content
+			include partials/footer.pug
+			
+	(2) home.pug에 추가
+		extends base.pug
+
+		block content
+			h1 Home
+			input(placeholder="Whats your name?")
+			button send
+			
+		=> url 띄워보기.
+		
+
+#5.7
+
+1. base.pug 추가
+
+// h1=pageTitle 에서 '=' 다음 변수 선언된 단어를 넣으면 변수로 인식함!(not Text)
+// 즉 h1=pageTitle 은 h1 #{pageTitle} 과 동일함!!
+// ex) h1 pageTitle 은 그냥 "pageTitle"이라는 텍스트를 출력
+// pageTitle 변수는 Home이고 header에서 h1으로 조정해준 것임.
+
+doctype html
+html(lang="ko")
+    head
+        title #{pageTitle} | Wetube
+        link(rel="stylesheet", href="https://unpkg.com/mvp.css")
+    body
+        header
+            h1=pageTitle
+        main
+            block content
+    include partials/footer.pug
+	
+2. home.pug 수정
+
+extends base.pug
+
+block content
+    h2 Welcome here you will see the trending videos
+	
+=> url 치면 Home 부분이 h1으로 나오는 것 확인!
+
+
+※ 조건문
+
+3. base.pug 추가
+
+doctype html
+html(lang="ko")
+    head
+        title #{pageTitle} | Wetube
+        link(rel="stylesheet", href="https://unpkg.com/mvp.css")
+    body
+        header
+            nav
+                ul
+                    li
+                        a(href="/login") Login
+            h1=pageTitle
+        main
+            block content
+    include partials/footer.pug
+	
+4. videoController.js 추가
+-- 가짜사용자 생성(테스트용)
+
+const fakeUser = {
+    username: "ilwoo",
+    loggedIn: false,
+}
+
+export const trending = (req, res) => res.render("home", {pageTitle: "Home", fakeUser: fakeUser});
+export const see = (req, res) => res.render("watch", {pageTitle: "Watch"});
+export const edit = (req, res) => res.render("edit", {pageTitle: "Edit"});
+export const search = (req, res) => res.send("Search");
+export const upload = (req, res) => res.send("Upload");
+export const deleteVideo = (req, res) => {
+    return res.send("Delete Video");
+};
+
+5. base.pug 추가
+-- fakeUser.loggedIn이 true면 Log out을 보여주고, false면 Login을 보여줌.
+-- videoController.js에서 false와 true로 바꿔가면서 url 테스트!
+-- fakeUser.loggedIn이 true일 때만 fakeUser.username을 출력.
+
+doctype html
+html(lang="ko")
+    head
+        title #{pageTitle} | Wetube
+        link(rel="stylesheet", href="https://unpkg.com/mvp.css")
+    body
+        header
+            if fakeUser.loggedIn
+                small Hello #{fakeUser.username}
+            nav
+                ul
+                    if fakeUser.loggedIn
+                        li
+                            a(href="/logout") Log out
+                    else
+                        li
+                            a(href="/login") Login
+            h1=pageTitle
+        main
+            block content
+    include partials/footer.pug
+	
+
+#5.8 배열(iteration)
+
+1. base.pug를 수정(원복)
+
+doctype html
+html(lang="ko")
+    head
+        title #{pageTitle} | Wetube
+        link(rel="stylesheet", href="https://unpkg.com/mvp.css")
+    body
+        header
+            h1=pageTitle
+        main
+            block content
+    include partials/footer.pug
+	
+2. videoController.js 수정
+-- videos라는 배열 선언, pageTitle변수에 넣음
+
+export const trending = (req, res) => {
+    const videos = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    return res.render("home", {pageTitle: "Home", videos})
+};
+export const see = (req, res) => res.render("watch", {pageTitle: "Watch"});
+export const edit = (req, res) => res.render("edit", {pageTitle: "Edit"});
+export const search = (req, res) => res.send("Search");
+export const upload = (req, res) => res.send("Upload");
+export const deleteVideo = (req, res) => {
+    return res.send("Delete Video");
+};
+
+3. home.pug 수정
+-- videos 배열에서 하나씩 꺼내어 video라는 변수에 담음.
+-- li로 각각의 video를 출력함.
+-- 그리고 li=video는 li #{video}와 동일함
+-- videos 배열은 controller의 videos와 동일해야 함!
+-- controller에서 배열에 아무것도 없다면 "Sorry Nothing found." 출력
+
+extends base.pug
+
+block content
+    h2 Welcome here you will see the trending videos
+    ul
+        each video in videos
+            li=video
+        else
+            li Sorry Nothing found.
+			
+=> url 치면 목록 출력
