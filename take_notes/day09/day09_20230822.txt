@@ -1,0 +1,76 @@
+#6.2 Edit Video part1
+
+
+1. videoController.js 수정
+
+export const watch = (req, res) => {
+    // ES6 문법
+    const {id} = req.params;
+    // const id = req.params.id;
+    // console.log("Show video", id);
+
+    const video = videos[id-1];
+
+    return res.render("watch", { pageTitle: `Watching: ${video.title}`, video });
+};
+export const edit = (req, res) => {
+    const {id} = req.params;
+    const video = videos[id-1];
+    return res.render("edit", { pageTitle: `Editing: ${video.title}` });
+};
+export const search = (req, res) => res.send("Search");
+
+
+2. edit.pug 수정
+
+extends base.pug
+
+block content
+    h4 Change Title of video
+    form(method="POST")
+        input(name="title", placeholder="Video Title", value=video.title, required)
+        input(value="Save", type="submit")
+		
+
+3. videoRouter.js 수정
+
+import express from "express";
+import { watch, getEdit, postEdit, upload, deleteVideo } from "../controllers/videoController";
+
+const videoRouter = express.Router();
+
+videoRouter.get("/:id(\\d+)", watch);
+videoRouter.get("/:id(\\d+)/edit", getEdit);
+videoRouter.post("/:id(\\d+)/edit", postEdit);
+videoRouter.get("/:id(\\d+)/delete", deleteVideo);
+videoRouter.get("/upload", upload);
+
+export default videoRouter;
+
+
+4. videoController.js 수정
+-- getEdit은 수정페이지 get방식으로 보여줄 때.
+-- postEdit은 수정페이지에서 바뀐 내용을 post방식으로 전달할 때.
+
+export const watch = (req, res) => {
+    // ES6 문법
+    const {id} = req.params;
+    // const id = req.params.id;
+    // console.log("Show video", id);
+
+    const video = videos[id-1];
+
+    return res.render("watch", { pageTitle: `Watching: ${video.title}`, video });
+};
+export const getEdit = (req, res) => {
+    const {id} = req.params;
+    const video = videos[id-1];
+    return res.render("edit", { pageTitle: `Editing: ${video.title}`, video });
+};
+export const postEdit = (req, res) => {};
+// export const search = (req, res) => res.send("Search");
+// export const upload = (req, res) => res.send("Upload");
+// export const deleteVideo = (req, res) => res.send("Delete Video");
+
+※ 당분간 search, upload, delete 기능은 사용하지 않으니 주석처리
+	videlController, globalRouter, videoRouter에서 주석.
