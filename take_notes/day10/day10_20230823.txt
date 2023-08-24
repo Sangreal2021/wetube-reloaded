@@ -1,0 +1,127 @@
+#6.3 Edit Video part2
+
+1. videoController.js 수정
+-- res.redirect() : 브라우저가 redirect(자동으로 이동)하게 하는 것.
+-- 해당 id를 가지고 watch video로 redirect.
+
+export const postEdit = (req, res) => {
+    const {id} = req.params;
+    return res.redirect(`/videos/${id}`);
+};
+
+2. videoRouter.js
+
+import express from "express";
+import { watch, getEdit, postEdit, upload, deleteVideo } from "../controllers/videoController";
+
+const videoRouter = express.Router();
+
+videoRouter.get("/:id(\\d+)", watch);
+// getEdit 과 postEdit을 합친 것
+videoRouter.route("/:id(\\d+)/edit").get(getEdit).post(postEdit);
+// videoRouter.get("/:id(\\d+)/edit", getEdit);
+// videoRouter.post("/:id(\\d+)/edit", postEdit);
+
+export default videoRouter;
+
+3. server.js 추가
+-- express.urlencoded() : express 어플이 form의 value들을 이해할 수 있도록 해주고
+   JS 형식으로 변형 시켜주는 middleware
+
+app.set("view engine", "pug");
+app.set("views", process.cwd() + "/src/views");
+app.use(logger);
+app.use(express.urlencoded({ extended: true }));
+app.use("/", globalRouter);
+app.use("/videos", videoRouter);
+app.use("/users", userRouter);
+
+=> edit 창에서 폼에 글자를 입력 후 버튼 누르고 VScode에 콘솔창 확인!!
+
+4. videoController.js
+-- req.body : 폼에 입력한 값 출력
+
+export const postEdit = (req, res) => {
+    const {id} = req.params;
+    // console.log(req.body);
+    const {title} = req.body;
+    videos[id-1].title = title;
+    return res.redirect(`/videos/${id}`);
+};
+
+=> watch 페이지에서도 적용되고, 홈 화면에서도 적용됨!
+
+※ MongoDB, Mongoose
+- Mongoose를 통해서 JS에서 mongodb와 상호작용 함.
+
+5. videoController.js
+-- get/post 업로드 컨트롤러 생성
+
+export const getUpload = (req, res) => {
+    return res.render("upload");
+};
+export const postUpload = (req, res) => {
+    // 비디오를 videos array에 추가할 예정
+    return res.redirect("/");
+};
+
+6. videoRouter.js
+-- getUpload, postUpload 추가
+
+import express from "express";
+import {
+    watch,
+    getEdit,
+    postEdit,
+    getUpload,
+    postUpload,
+} from "../controllers/videoController";
+
+const videoRouter = express.Router();
+
+videoRouter.get("/:id(\\d+)", watch);
+// getEdit 과 postEdit을 합친 것
+videoRouter.route("/:id(\\d+)/edit").get(getEdit).post(postEdit);
+videoRouter.route("/upload").get(getUpload).post(postUpload);
+
+export default videoRouter;
+
+7. base.pug 추가 : 템플릿에 nav 추가하고 upload로 가는 a태그 설정
+
+doctype html
+html(lang="ko")
+    head
+        title #{pageTitle} | Wetube
+        link(rel="stylesheet", href="https://unpkg.com/mvp.css")
+    body
+        header
+            h1=pageTitle
+			nav
+				ul
+					li
+						a(href="/upload") Upload Video
+        main
+            block content
+    include partials/footer.pug
+	
+8. views 폴더에 upload.pug 파일 생성
+
+extends base.pug
+
+block content
+    h3 hello from upload
+	
+9. videoController 수정
+
+export const getUpload = (req, res) => {
+    return res.render("upload", {pageTitle: "Upload Video"});
+};
+
+10. upload.pug 수정
+
+extends base.pug
+
+block content
+    form(method="POST")
+        input(placeholder="Title", required, type="text")
+        input(type="submit", value="Upload Video")
